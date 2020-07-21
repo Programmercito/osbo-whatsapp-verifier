@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package bo.osbo.whatsapp.verifier;
 
 import java.awt.AWTException;
@@ -13,8 +8,10 @@ import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBuffer;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.Date;
+import java.util.Properties;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Level;
@@ -31,19 +28,28 @@ import kong.unirest.Unirest;
 public class Ejecutador {
 
     public static void main(String args[]) {
-        TimerTask timerTask = new TimerTask() {
+        TimerTask timerTask;
+        timerTask = new TimerTask() {
             BufferedImage anterior;
             BufferedImage nueva;
+            FileReader reader;
+
+            Properties p = new Properties();
 
             @Override
             public void run() {
                 try {
-                    nueva = Ejecutador.captura(3100, 90, 100, 40);
+                    reader = new FileReader("conf.properties");
+                    p.load(reader);
+                    String ruta = (String) p.get("rutatemp");
+                    String chat = (String) p.get("chat");
+                    nueva = Ejecutador.captura(0, 0, 120, 90, ruta);
                     boolean compare = Ejecutador.compareImage(nueva, anterior);
                     if (!compare) {
                         System.out.println("ha ocurrido un cambio en :" + (new Date()));
                         anterior = nueva;
-                        HttpResponse<String> asString = Unirest.post("https://api.telegram.org/botxxxxxxxxx/sendPhoto").field("chat_id", "509861682").field("photo", new File ("i://wha//PartialScreenshot.bmp")).asString();
+                        String bot = (String) p.get("bot");
+                        HttpResponse<String> asString = Unirest.post("https://api.telegram.org/bot" + bot + "/sendPhoto").field("chat_id", chat).field("photo", new File(ruta + "PartialScreenshot.bmp")).asString();
                         System.out.println(asString.getBody());
                     }
                 } catch (IOException ex) {
@@ -58,17 +64,17 @@ public class Ejecutador {
         timer.scheduleAtFixedRate(timerTask, 0, 1000);
     }
 
-    public static BufferedImage captura(int x1, int y1, int x2, int y2) throws IOException, AWTException {
+    public static BufferedImage captura(int x1, int y1, int x2, int y2, String ruta) throws IOException, AWTException {
         Robot robot = new Robot();
         String format = "bmp";
-        String fileName = "i://wha//PartialScreenshot." + format;
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        String fileName = ruta + "PartialScreenshot." + format;
+        Toolkit.getDefaultToolkit().getScreenSize();
         Rectangle captureRect = new Rectangle(x1, y1, x2, y2);
         BufferedImage screenFullImage = robot.createScreenCapture(captureRect);
         try {
             ImageIO.write(screenFullImage, format, new File(fileName));
         } catch (NullPointerException npe) {
-            System.out.println("problemitas");
+            System.out.println("problemitas de grabacion");
         }
         return screenFullImage;
     }
