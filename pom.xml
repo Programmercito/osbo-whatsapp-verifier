@@ -12,11 +12,6 @@
     </properties>
     <dependencies>
         <dependency>
-            <groupId>com.asprise.ocr</groupId>
-            <artifactId>java-ocr-api</artifactId>
-            <version>15.3.0.3</version>
-        </dependency>
-        <dependency>
             <groupId>com.konghq</groupId>
             <artifactId>unirest-java</artifactId>
             <version>2.3.08</version>
