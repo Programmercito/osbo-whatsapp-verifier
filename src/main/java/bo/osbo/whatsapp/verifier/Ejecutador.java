@@ -43,13 +43,22 @@ public class Ejecutador {
                     p.load(reader);
                     String ruta = (String) p.get("rutatemp");
                     String chat = (String) p.get("chat");
-                    nueva = Ejecutador.captura(0, 0, 120, 90, ruta);
+                    
+                    int iniciox, inicioy, finx, finy;
+                    iniciox = Integer.parseInt((String) p.get("iniciox"));
+                    inicioy = Integer.parseInt((String) p.get("inicioy"));
+                    finx = Integer.parseInt((String) p.get("finx"));
+                    finy = Integer.parseInt((String) p.get("finy"));
+
+                    nueva = Ejecutador.captura(iniciox, inicioy, finx, finy, ruta);
                     boolean compare = Ejecutador.compareImage(nueva, anterior);
                     if (!compare) {
                         System.out.println("ha ocurrido un cambio en :" + (new Date()));
                         anterior = nueva;
                         String bot = (String) p.get("bot");
-                        HttpResponse<String> asString = Unirest.post("https://api.telegram.org/bot" + bot + "/sendPhoto").field("chat_id", chat).field("photo", new File(ruta + "PartialScreenshot.bmp")).asString();
+                        HttpResponse<String> asString = Unirest
+                                .post("https://api.telegram.org/bot" + bot + "/sendPhoto").field("chat_id", chat)
+                                .field("photo", new File(ruta + "PartialScreenshot.bmp")).asString();
                         System.out.println(asString.getBody());
                     }
                 } catch (IOException ex) {
