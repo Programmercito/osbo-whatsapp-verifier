@@ -33,7 +33,7 @@ public class Ejecutador {
             BufferedImage anterior;
             BufferedImage nueva;
             FileReader reader;
-
+            int contador = 0;
             Properties p = new Properties();
 
             @Override
@@ -43,7 +43,7 @@ public class Ejecutador {
                     p.load(reader);
                     String ruta = (String) p.get("rutatemp");
                     String chat = (String) p.get("chat");
-                    
+
                     int iniciox, inicioy, finx, finy;
                     iniciox = Integer.parseInt((String) p.get("iniciox"));
                     inicioy = Integer.parseInt((String) p.get("inicioy"));
@@ -60,6 +60,17 @@ public class Ejecutador {
                                 .post("https://api.telegram.org/bot" + bot + "/sendPhoto").field("chat_id", chat)
                                 .field("photo", new File(ruta + "PartialScreenshot.bmp")).asString();
                         System.out.println(asString.getBody());
+                    }
+                    //se hace click de mouse para ser compatible con version beta de whatsapp
+                    int x = iniciox + finx + 1;
+
+                    if (contador < 4) {
+                        contador++;
+                    } else {
+                        MouseUtils.click(x, 0);
+                        MouseUtils.move(x, inicioy + finy + 1);
+                        MouseUtils.move(x, inicioy + finy + 2);
+                        contador = 0;
                     }
                 } catch (IOException ex) {
                     Logger.getLogger(Ejecutador.class.getName()).log(Level.SEVERE, null, ex);
